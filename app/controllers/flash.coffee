@@ -3,8 +3,7 @@
 `import Broadcast from 'travis/models/broadcast'`
 
 Controller = Ember.ArrayController.extend
-  needs: ['currentUser']
-  currentUserBinding: 'controllers.currentUser.model'
+  currentUserBinding: 'auth.currentUser'
 
   init: ->
     @_super.apply this, arguments
@@ -28,7 +27,7 @@ Controller = Ember.ArrayController.extend
     broadcasts = Ember.ArrayProxy.create(content: [])
 
     if @get('currentUser.id')
-      @store.find('broadcast').then (result) ->
+      @store.findAll('broadcast').then (result) ->
         broadcasts.pushObjects(result.toArray())
 
     broadcasts
@@ -36,7 +35,7 @@ Controller = Ember.ArrayController.extend
 
   loadFlashes: (msgs) ->
     for msg in msgs
-      type = Ember.keys(msg)[0]
+      type = Object.keys(msg)[0]
       msg = { type: type, message: msg[type] }
       @get('flashes').unshiftObject(msg)
       Ember.run.later(this, (-> @get('flashes.content').removeObject(msg)), 15000)
